@@ -3,6 +3,7 @@ from multiprocessing import Pool
 import subprocess
 import argparse
 
+interesting_paths = ['config']
 
 parser = argparse.ArgumentParser(description='This programm finds all files containing the specified string')
 parser.add_argument('directory', help='directory to start')
@@ -48,6 +49,9 @@ def main():
 def gprint(string):
     print('\033[92m' + string + '\033[0m')
 
+def rprint(string):
+    print('\033[91m' + string + '\033[0m')
+
 def check_if_in_file(file_name):
     global string
     encoding = get_file_encoding(file_name)
@@ -63,7 +67,11 @@ def check_if_in_file(file_name):
 def check_file(file_name,string,encoding):
     with open(file_name,mode='r', encoding=encoding) as reader:
         if string.lower() in reader.read().lower():
-            gprint(file_name)
+            if any(subpath in file_name for subpath in interesting_paths):
+                rprint(file_name)
+            else:
+                gprint(file_name)
+
             with open(file_name,mode='r', encoding=encoding) as inner:
                 for line in inner:
                     if string.lower() in line.lower():
