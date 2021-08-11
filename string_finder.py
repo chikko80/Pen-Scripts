@@ -22,7 +22,7 @@ def main():
         results = pool.map(check_if_in_file, files)
 
 def gprint(string):
-    print(f'\033[92m{string}\033[0m')            
+    print('\033[92m' + string + '\033[0m')
 
 def check_if_in_file(file_name):
     global string
