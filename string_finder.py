@@ -11,18 +11,39 @@ args = parser.parse_args()
 dir_name = args.directory
 string = args.string
 
+def print_banner():
+    return """
+  █████████   █████               ███                     
+ ███░░░░░███ ░░███               ░░░                      
+░███    ░░░  ███████   ████████  ████  ████████    ███████
+░░█████████ ░░░███░   ░░███░░███░░███ ░░███░░███  ███░░███
+ ░░░░░░░░███  ░███     ░███ ░░░  ░███  ░███ ░███ ░███ ░███
+ ███    ░███  ░███ ███ ░███      ░███  ░███ ░███ ░███ ░███
+░░█████████   ░░█████  █████     █████ ████ █████░░███████
+ ░░░░░░░░░     ░░░░░  ░░░░░     ░░░░░ ░░░░ ░░░░░  ░░░░░███
+                                                  ███ ░███
+                                                 ░░██████ 
+                                                  ░░░░░░  
+ ███████████  ███                 █████                   
+░░███░░░░░░█ ░░░                 ░░███                    
+ ░███   █ ░  ████  ████████    ███████   ██████  ████████ 
+ ░███████   ░░███ ░░███░░███  ███░░███  ███░░███░░███░░███
+ ░███░░░█    ░███  ░███ ░███ ░███ ░███ ░███████  ░███ ░░░ 
+ ░███  ░     ░███  ░███ ░███ ░███ ░███ ░███░░░   ░███     
+ █████       █████ ████ █████░░████████░░██████  █████   
+    """
+
 def main():
     global dir_name
+    print_banner()
+    print("-------------------------------------------------------------")
     print("This programm finds all files containing the specified string")
-    # dir_name = input("Please enter the start_directory name: ")
+    print("-------------------------------------------------------------")
     files = get_all_files(dir_name)
-    print(string)
 
-    # with Pool() as pool:
-    #     results = pool.map(check_if_in_file, files)
+    with Pool() as pool:
+        results = pool.map(check_if_in_file, files)
 
-    for file in files:
-        check_if_in_file(file)
 
 def gprint(string):
     print('\033[92m' + string + '\033[0m')
