@@ -67,6 +67,8 @@ def check_file(file_name,string,encoding):
             with open(file_name,mode='r', encoding=encoding) as inner:
                 for line in inner:
                     if string.lower() in line.lower():
+                        if len(line) > 200:
+                            print(line[:200].strip())
                         print(line.strip())
                 print()
             return True
