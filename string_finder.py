@@ -1,5 +1,4 @@
 import os
-from termcolor import cprint
 from multiprocessing import Pool
 import subprocess
 import argparse
@@ -22,8 +21,8 @@ def main():
     with Pool() as pool:
         results = pool.map(check_if_in_file, files)
 
-            
-
+def gprint(string):
+    print(f'\033[92m{string}\033[0m')            
 
 def check_if_in_file(file_name):
     global string
@@ -32,14 +31,14 @@ def check_if_in_file(file_name):
         try:
             with open(file_name,mode='r', encoding=encoding) as reader:
                 if string in reader.read():
-                    cprint(file_name, 'green')
+                    gprint(file_name)
                     return True
             return False
         except (UnicodeDecodeError, LookupError):
             try:
                 with open(file_name,mode='r', encoding='utf-8') as reader:
                     if string in reader.read():
-                        cprint(file_name, 'green')
+                        gprint(file_name)
                         return True
                 return False
             except UnicodeDecodeError:
