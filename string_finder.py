@@ -32,24 +32,24 @@ def check_if_in_file(file_name):
     encoding = get_file_encoding(file_name)
     if encoding:
         try:
-            with open(file_name,mode='r', encoding=encoding) as reader:
-                if string.lower() in reader.read().lower():
-                    gprint(file_name)
-                    with open(file_name,mode='r', encoding=encoding) as inner:
-                        for line in inner:
-                            if string.lower() in line.lower():
-                                print(line)
-                    return True
-            return False
+            check_file(file_name, string, encoding)
         except (UnicodeDecodeError, LookupError):
             try:
-                with open(file_name,mode='r', encoding='utf-8') as reader:
-                    if string.lower() in reader.read().lower():
-                        gprint(file_name)
-                        return True
-                return False
+                check_file(file_name, string, 'utf-8')
             except UnicodeDecodeError:
                 pass
+
+def check_file(file_name,string,encoding):
+    with open(file_name,mode='r', encoding=encoding) as reader:
+        if string.lower() in reader.read().lower():
+            gprint(file_name)
+            with open(file_name,mode='r', encoding=encoding) as inner:
+                for line in inner:
+                    if string.lower() in line.lower():
+                        print(line.strip())
+                print()
+            return True
+    return False
 
 def get_file_encoding(file_name):
     output = subprocess.run(['file', '-ib', file_name], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
