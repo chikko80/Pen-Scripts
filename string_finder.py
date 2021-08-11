@@ -18,8 +18,11 @@ def main():
     files = get_all_files(dir_name)
     print(string)
 
-    with Pool() as pool:
-        results = pool.map(check_if_in_file, files)
+    # with Pool() as pool:
+    #     results = pool.map(check_if_in_file, files)
+
+    for file in files:
+        check_if_in_file(file)
 
 def gprint(string):
     print('\033[92m' + string + '\033[0m')
@@ -30,14 +33,18 @@ def check_if_in_file(file_name):
     if encoding:
         try:
             with open(file_name,mode='r', encoding=encoding) as reader:
-                if string in reader.read():
+                if string.lower() in reader.read().lower():
                     gprint(file_name)
+                    with open(file_name,mode='r', encoding=encoding) as inner:
+                        for line in inner:
+                            if string.lower() in line.lower():
+                                print(line)
                     return True
             return False
         except (UnicodeDecodeError, LookupError):
             try:
                 with open(file_name,mode='r', encoding='utf-8') as reader:
-                    if string in reader.read():
+                    if string.lower() in reader.read().lower():
                         gprint(file_name)
                         return True
                 return False
