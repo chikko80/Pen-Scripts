@@ -59,11 +59,21 @@ def gobuster_scan(ip):
 @menu_decorator({"color": GREEN, "text": "Comments Scan" })
 def comment_scan(ip):
 	response = requests.get(f"http://{ip}/")
-	comments = re.findall(r'(\/\*[\w\'\s\r\n\*]*\*\/)|(\/\/[\w\s\']*)|(\<![\-\-\s\w\>\/]*\>)', response.text)
+	html_comments = re.findall(r'\<\!\-\-(?:.|\n|\r)*?-->', response.text)
+	css_js_comments = re.findall(r'(\/\*[\w\'\s\r\n\*]*\*\/)|(\/\/[\w\s\']*)|(\<![\-\-\s\w\>\/]*\>)', response.text)
 
-	filtered = list(set([comment for tuplee in comments for comment in tuplee if comment]))
-	for comment in filtered:
+	def filter_comments(comments):
+		if type(comments[0]) == tuple:
+			return list(set([comment for tuplee in comments for comment in tuplee if comment]))
+		else:
+			return list(set(comments))
+	
+	for comment in filter_comments(html_comments):
 		print(comment)
+
+	for comment in filter_comments(css_js_comments):
+		print(comment)
+
 
 # wappalyzer scan
 @menu_decorator({"color": PURPLE, "text": "Wappalyzer Scan" })
