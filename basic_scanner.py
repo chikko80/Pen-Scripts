@@ -1,7 +1,5 @@
 import argparse
 import os
-import subprocess
-from threading import Thread
 
 parser = argparse.ArgumentParser(description='Basic Scanner for CTF')
 parser.add_argument('host', help='directory to start')
@@ -40,18 +38,12 @@ def main():
 # execute nmap scan
 @menu_decorator({"color": YELLOW, "text": "Gobuster Scan" })
 def nmap_scan(ip):
-	command = f"nmap -A {ip}"
-	Thread(target=execute_command, args=(command,)).start()
+	os.system(f"nmap -A {ip}")
 
 # execute gobuster scan
 @menu_decorator({"color": CYAN, "text": "Agressiv NMAP SCAN" })
 def gobuster_scan(ip):
-	command = "gobuster dir -u {ip} -w /usr/share/wordlists/dirb/common.txt -s '200-300' -e" 
-	Thread(target=execute_command, args=(command,)).start()
-
-def execute_command(command):
-	output = subprocess.run(command.split(), stdout=subprocess.PIPE).stdout.decode('utf-8')
-	print(output)
+	os.system(f"gobuster dir -u {ip} -w /usr/share/wordlists/dirb/common.txt -s '200-300' -e" )
 
 def print_colored_line(color):
 	print(color + "---------------------------------------------------------------------------------" + '\033[0m')
