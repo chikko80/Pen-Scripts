@@ -36,12 +36,12 @@ def main():
 	gobuster_scan(ip)
 
 # execute nmap scan
-@menu_decorator({"color": YELLOW, "text": "Gobuster Scan" })
+@menu_decorator({"color": CYAN, "text": "Agressiv NMAP SCAN" })
 def nmap_scan(ip):
 	os.system(f"nmap -A {ip}")
 
 # execute gobuster scan
-@menu_decorator({"color": CYAN, "text": "Agressiv NMAP SCAN" })
+@menu_decorator({"color": YELLOW, "text": "Gobuster Scan" })
 def gobuster_scan(ip):
 	os.system(f"gobuster dir -u {ip} -w /usr/share/wordlists/dirb/common.txt -s '200-300' -e" )
 
