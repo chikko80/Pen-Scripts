@@ -22,7 +22,7 @@ def menu_decorator(color_args):
 	def function_wrapper(func):
 		def draw_outlines(*args):
 			print_colored_line(color_args['color'])
-			print_colored_string(color_args['color'], f'\t{color_args['text']}')
+			print_colored_string(color_args['color'], f"\t{color_args['text']}")
 			print_colored_line(color_args['color'])
 			func(*args)
 			print_colored_line(color_args['color'])
