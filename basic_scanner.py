@@ -43,7 +43,7 @@ def nmap_scan(ip):
 # execute gobuster scan
 @menu_decorator({"color": YELLOW, "text": "Gobuster Scan" })
 def gobuster_scan(ip):
-	os.system(f"gobuster dir -u {ip} -w /usr/share/wordlists/dirb/common.txt -s '200-300' -e" )
+	os.system(f"gobuster dir -u {ip} -w /usr/share/wordlists/dirb/common.txt" )
 
 def print_colored_line(color):
 	print(color + "---------------------------------------------------------------------------------" + '\033[0m')
