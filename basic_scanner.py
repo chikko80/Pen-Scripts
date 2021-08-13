@@ -68,11 +68,13 @@ def comment_scan(ip):
 		else:
 			return list(set(comments))
 	
-	for comment in filter_comments(html_comments):
-		print(comment)
+	if html_comments:
+		for comment in filter_comments(html_comments):
+			print(comment)
 
-	for comment in filter_comments(css_js_comments):
-		print(comment)
+	if css_js_comments:
+		for comment in filter_comments(css_js_comments):
+			print(comment)
 
 
 # wappalyzer scan
