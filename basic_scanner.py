@@ -53,7 +53,7 @@ def nmap_scan(ip):
 # gobuster scan
 @menu_decorator({"color": YELLOW, "text": "Gobuster Scan" })
 def gobuster_scan(ip):
-	os.system(f"gobuster dir -u {ip} -w /usr/share/wordlists/dirb/common.txt" )
+	os.system(f"gobuster dir -u {ip} -w /usr/share/wordlists/dirb/common.txt")
 
 # comment scan
 @menu_decorator({"color": GREEN, "text": "Comments Scan" })
