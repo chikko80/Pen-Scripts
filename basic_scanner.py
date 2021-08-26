@@ -61,7 +61,7 @@ def nmap_scan(ip):
 def gobuster_scan(ip):
     global subdirectories
     print(f'Scanning {ip}...')
-    output = subprocess.run(shlex.split(f"gobuster dir -u {ip} -w /usr/share/wordlists/dirb/common.txt"), stdout=subprocess.PIPE).stdout.decode('utf-8')
+    output = subprocess.run(shlex.split(f"gobuster dir -u {ip} -w /usr/share/wordlists/dirb/common.txt -t 100 --timeout 20s"), stdout=subprocess.PIPE).stdout.decode('utf-8')
     print(output)
     output = output.split('\n')
     for line in output:
