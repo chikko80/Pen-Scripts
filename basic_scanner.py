@@ -50,10 +50,10 @@ def main():
     print_colored_line(GREEN)
     print_colored_string(GREEN, f"Scanning {ip}...")
 
-    # nmap_scan(ip)
+    nmap_scan(ip)
     gobuster_scan(ip)
     comment_scan(ip)
-    # wappalyzer_scan(ip)
+    wappalyzer_scan(ip)
 
 # nmap scan
 @menu_decorator({"color": CYAN, "text": "Aggressiv NMAP SCAN" })
