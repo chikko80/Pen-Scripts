@@ -10,13 +10,17 @@ from Wappalyzer import Wappalyzer, WebPage
 import re
 import subprocess
 import shlex
+import threading
+import sys
 
 subdirectories = []
 
 parser = argparse.ArgumentParser(description='Basic Scanner for CTF')
 parser.add_argument('host', help='directory to start')
+parser.add_argument('--rec','-r', help='recursive gobuster scan', action='store_true')
 args = parser.parse_args()
 ip = args.host
+rec = args.rec
 
 PURPLE = '\033[95m'
 CYAN = '\033[96m'
@@ -44,12 +48,12 @@ def menu_decorator(color_args):
 def main():
     global ip
     print_colored_line(GREEN)
-    print_colored_string(GREEN, f"Scanning {ip}")
+    print_colored_string(GREEN, f"Scanning {ip}...")
 
-    nmap_scan(ip)
+    # nmap_scan(ip)
     gobuster_scan(ip)
     comment_scan(ip)
-    wappalyzer_scan(ip)
+    # wappalyzer_scan(ip)
 
 # nmap scan
 @menu_decorator({"color": CYAN, "text": "Aggressiv NMAP SCAN" })
@@ -59,17 +63,72 @@ def nmap_scan(ip):
 # gobuster scan
 @menu_decorator({"color": YELLOW, "text": "Gobuster Scan" })
 def gobuster_scan(ip):
+    global rec
+    def scan_recursive(route='/'):
+        if not route == '/':
+            print(route)
+        global subdirectories
+        subdirectories.append(route)
+        # output = subprocess.run(shlex.split(f"gobuster dir -u http://{ip}{route} -w /usr/share/wordlists/dirb/common.txt -t 100 --timeout 20s"), stdout=subprocess.PIPE).stdout.decode('utf-8')
+        output = subprocess.run(shlex.split(f"gobuster dir -u http://{ip}{route} -w common.txt -t 100 --timeout 20s"), stdout=subprocess.PIPE).stdout.decode('utf-8')
+        delete_line()
+        output = output.split('\n')
+
+        if rec:
+            thread_list = []
+            for name in get_dirnames(output):
+                def scan_rec(route,name):
+                    if route == '/':
+                        scan_serial(f'{route}{name}')
+                    else:
+                        scan_serial(f'{route}/{name}')
+
+                thread = threading.Thread(target=scan_rec, args=(route,name))
+                thread_list.append(thread)
+                thread.start()
+            
+            for thread in thread_list:
+                thread.join()
+        else:
+            for name in get_dirnames(output):
+                print(f'{route}{name}')
+        
+    scan_recursive()
+
+
+def scan_serial(route):
+    print(route)
     global subdirectories
-    print(f'Scanning {ip}...')
-    output = subprocess.run(shlex.split(f"gobuster dir -u {ip} -w /usr/share/wordlists/dirb/common.txt -t 100 --timeout 20s"), stdout=subprocess.PIPE).stdout.decode('utf-8')
-    print(output)
+    subdirectories.append(route)
+    # output = subprocess.run(shlex.split(f"gobuster dir -u http://{ip}{route} -w /usr/share/wordlists/dirb/common.txt -t 100 --timeout 20s"), stdout=subprocess.PIPE).stdout.decode('utf-8')
+    output = subprocess.run(shlex.split(f"gobuster dir -u http://{ip}{route} -w common.txt -t 100 --timeout 20s"), stdout=subprocess.PIPE).stdout.decode('utf-8')
+    delete_line()
     output = output.split('\n')
+
+    for name in get_dirnames(output):
+        if len(name.split('.')) == 2:
+            if name.split('.')[0] and name.split('.')[1]:
+                if not name == 'index.html':
+                    print(f'{route}/{name}')
+                continue
+        if route == '/':
+            scan_serial(f'{route}{name}')
+        else:
+            scan_serial(f'{route}/{name}')
+
+
+def get_dirnames(output):
+    dirs = []
     for line in output:
         line = line.strip()
         if line.startswith('/'):
-            line = line.split()[0].replace('/', '')
-            subdirectories.append(line)
-    return subdirectories
+            line = line.split()[0].replace('/', '') # dirname without anything
+            dirs.append(line)
+    return dirs
+
+def delete_line():
+    sys.stdout.write('\033[F') #back to previous line
+    sys.stdout.write('\033[K') #clear line
 
 
 # comment scan
@@ -77,12 +136,15 @@ def gobuster_scan(ip):
 def comment_scan(ip):
 
     def get_comments(ip,subdirectory):
-        url = f"http://{ip}/{subdirectory}"
+        url = f"http://{ip}{subdirectory}"
         if not subdirectory:
             url = f"http://{ip}/"
         response = requests.get(url)
         html_comments = re.findall(r'\<\!\-\-(?:.|\n|\r)*?-->', response.text)
         css_js_comments = re.findall(r'(\/\*[\w\'\s\r\n\*]*\*\/)|(\/\/[\w\s\']*)|(\<![\-\-\s\w\>\/]*\>)', response.text)
+
+        user_passwd = re.findall(r'[a-zA-Z][a-zA-Z0-9]+:[^: \&\.\~]*[a-zA-Z0-9]+[^:\&\.\~]+', response.text)
+
 
         def filter_comments(comments):
             if type(comments[0]) == tuple:
@@ -98,6 +160,10 @@ def comment_scan(ip):
         if css_js_comments:
             for comment in filter_comments(css_js_comments):
                 print(comment)
+        
+        if user_passwd:
+            for entry in user_passwd:
+                print(entry)
 
     global subdirectories
     get_comments(ip, None)

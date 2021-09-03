@@ -1,4 +1,3 @@
-
 import readline
 import glob
 
