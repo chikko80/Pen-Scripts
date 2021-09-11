@@ -137,7 +137,9 @@ def delete_line():
 
 @menu_decorator({"color": BLUE, "text": "Subdomain Scan" })
 def wfuzz_scan(ip):
-    command = f'wfuzz -c -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt -u "http://{ip}" -H "Host: FUZZ.{ip}" --hw 290'
+    command = f'wfuzz -c -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt -u "http://{ip}" -H "Host: FUZZ.{ip}"'
+    print('Exclude Words --hw x (for example 290, check results)')
+    print(command)
     print(subprocess.getoutput(command))
 
 # comment scan
