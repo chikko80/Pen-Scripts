@@ -18,9 +18,11 @@ subdirectories = []
 parser = argparse.ArgumentParser(description='Basic Scanner for CTF')
 parser.add_argument('host', help='directory to start')
 parser.add_argument('--rec','-r', help='recursive gobuster scan', action='store_true')
+parser.add_argument('--subdomains','-s', help='scan subdomains', action='store_true')
 args = parser.parse_args()
 ip = args.host
 rec = args.rec
+sub = args.subdomains
 
 PURPLE = '\033[95m'
 CYAN = '\033[96m'
@@ -52,6 +54,8 @@ def main():
 
     nmap_scan(ip)
     gobuster_scan(ip)
+    if sub:
+        wfuzz_scan(ip)
     comment_scan(ip)
     wappalyzer_scan(ip)
 
@@ -100,8 +104,8 @@ def scan_serial(route):
     print(route)
     global subdirectories
     subdirectories.append(route)
-    # output = subprocess.run(shlex.split(f"gobuster dir -u http://{ip}{route} -w /usr/share/wordlists/dirb/common.txt -t 100 --timeout 20s"), stdout=subprocess.PIPE).stdout.decode('utf-8')
-    output = subprocess.run(shlex.split(f"gobuster dir -u http://{ip}{route} -w common.txt -t 100 --timeout 20s"), stdout=subprocess.PIPE).stdout.decode('utf-8')
+    output = subprocess.run(shlex.split(f"gobuster dir -u http://{ip}{route} -w /usr/share/wordlists/dirb/common.txt -t 100 --timeout 20s"), stdout=subprocess.PIPE).stdout.decode('utf-8')
+    # output = subprocess.run(shlex.split(f"gobuster dir -u http://{ip}{route} -w common.txt -t 100 --timeout 20s"), stdout=subprocess.PIPE).stdout.decode('utf-8')
     delete_line()
     output = output.split('\n')
 
@@ -130,6 +134,11 @@ def delete_line():
     sys.stdout.write('\033[F') #back to previous line
     sys.stdout.write('\033[K') #clear line
 
+
+@menu_decorator({"color": BLUE, "text": "Subdomain Scan" })
+def wfuzz_scan(ip):
+    command = f'wfuzz -c -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt -u "http://{ip}" -H "Host: FUZZ.{ip}" --hw 290'
+    print(subprocess.getoutput(command))
 
 # comment scan
 @menu_decorator({"color": GREEN, "text": "Comments Scan" })
